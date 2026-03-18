@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RegiForge — Запись</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0b0e;
+    --surface: #15121a;
+    --surface2: #1e1827;
+    --border: #2e2438;
+    --gold: #c9a96e;
+    --gold-light: #e8c98a;
+    --gold-dim: #7a5c2e;
+    --pink: #d4789a;
+    --pink-dim: #5a2a3d;
+    --text: #f0eaf5;
+    --text-muted: #7a6d8a;
+    --text-dim: #4a4055;
+    --accent: #8b5cf6;
+    --radius: 18px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-size: 15px;
+  }
+
+  /* Background grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 24px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--gold);
+  }
+
+  .logo span { color: var(--text); font-weight: 300; }
+
+  .avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink-dim), var(--gold-dim));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+  }
+
+  .greeting {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* HERO BANNER */
+  .hero {
+    margin: 20px 16px 0;
+    background: linear-gradient(135deg, #1a0e2e 0%, #0f1a2e 50%, #1a0e1a 100%);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 22px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(201,169,110,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 40px;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle, rgba(212,120,154,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--gold), #b08040);
+    color: #0d0b0e;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 11px 22px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-primary:active { transform: scale(0.97); opacity: 0.9; }
+
+  /* SECTION */
+  .section { padding: 24px 16px 0; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .section-link {
+    font-size: 12px;
+    color: var(--gold);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  /* SERVICES GRID */
+  .services-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .service-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .service-card:active { transform: scale(0.97); }
+
+  .service-card.selected {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, rgba(201,169,110,0.08), var(--surface));
+  }
+
+  .service-icon {
+    font-size: 26px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .service-name {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .service-price {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .service-duration {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* MASTERS */
+  .masters-row {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .masters-row::-webkit-scrollbar { display: none; }
+
+  .master-card {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .master-ava {
+    width: 62px; height: 62px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    background: var(--surface2);
+    transition: border-color 0.2s;
+    position: relative;
+  }
+
+  .master-card.selected .master-ava {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,169,110,0.2);
+  }
+
+  .master-badge {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 18px; height: 18px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    color: #0d0b0e;
+    border: 2px solid var(--bg);
+  }
+
+  .master-name {
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .master-spec {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: -4px;
+  }
+
+  .master-rating {
+    font-size: 10px;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  /* CALENDAR */
+  .calendar-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .cal-month {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 500;
+  }
+
+  .cal-nav {
+    display: flex;
+    gap: 4px;
+  }
+
+  .cal-nav-btn {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .cal-nav-btn:active { background: var(--surface2); }
+
+  .cal-days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 8px;
+  }
+
+  .cal-day-name {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-dim);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .cal-day:not(.empty):hover { background: var(--surface2); }
+  .cal-day.today { color: var(--gold); font-weight: 500; }
+  .cal-day.selected { background: var(--gold); color: #0d0b0e; font-weight: 600; }
+  .cal-day.past { color: var(--text-dim); pointer-events: none; }
+  .cal-day.has-slots::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--pink);
+  }
+  .cal-day.selected::after { background: rgba(0,0,0,0.4); }
+  .cal-day.empty { pointer-events: none; }
+
+  /* TIME SLOTS */
+  .slots-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .slot {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 4px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .slot:active { transform: scale(0.96); }
+  .slot.selected { background: var(--pink-dim); border-color: var(--pink); color: var(--pink); }
+  .slot.busy { color: var(--text-dim); pointer-events: none; text-decoration: line-through; background: transparent; }
+
+  /* BOOKING SUMMARY */
+  .summary-card {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin: 0 16px;
+  }
+
+  .summary-title {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-row:last-child { border-bottom: none; }
+
+  .summary-label { font-size: 13px; color: var(--text-muted); }
+  .summary-value { font-size: 13px; font-weight: 500; }
+  .summary-value.gold { color: var(--gold); }
+
+  .deposit-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    margin: 10px 16px 0;
+    line-height: 1.5;
+  }
+
+  /* BOTTOM ACTION */
+  .bottom-action {
+    padding: 16px;
+    margin-top: auto;
+  }
+
+  .btn-book {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: none;
+    background: linear-gradient(135deg, var(--gold), #b08040);
+    color: #0d0b0e;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-book:active { transform: scale(0.98); opacity: 0.9; }
+  .btn-book:disabled { background: var(--surface2); color: var(--text-dim); pointer-events: none; }
+
+  /* NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(13, 11, 14, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 16px;
+    z-index: 100;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: var(--text-dim);
+    transition: color 0.2s;
+    padding: 4px 16px;
+    border-radius: var(--radius-sm);
+  }
+
+  .nav-item.active { color: var(--gold); }
+
+  .nav-icon { font-size: 20px; }
+  .nav-label { font-size: 10px; font-weight: 500; letter-spacing: 0.05em; }
+
+  /* TABS */
+  .page { display: none; padding-bottom: 90px; }
+  .page.active { display: block; }
+
+  /* MY APPOINTMENTS */
+  .appt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .appt-date-block {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    width: 50px;
+    height: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+
+  .appt-day { font-size: 20px; font-weight: 600; color: var(--gold); line-height: 1; }
+  .appt-mon { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .appt-info { flex: 1; }
+  .appt-service { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .appt-meta { font-size: 12px; color: var(--text-muted); display: flex; gap: 10px; }
+
+  .appt-status {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .status-confirmed { background: rgba(201,169,110,0.15); color: var(--gold); }
+  .status-done { background: rgba(100,200,120,0.12); color: #6bc87a; }
+  .status-cancelled { background: rgba(220,80,80,0.1); color: #e07070; }
+
+  /* REVIEWS */
+  .review-prompt {
+    background: linear-gradient(135deg, rgba(212,120,154,0.1), rgba(201,169,110,0.08));
+    border: 1px solid var(--pink-dim);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .review-prompt-icon { font-size: 28px; }
+  .review-prompt-text { flex: 1; }
+  .review-prompt-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .review-prompt-sub { font-size: 11px; color: var(--text-muted); }
+
+  .stars-row { display: flex; gap: 6px; margin-top: 10px; }
+  .star { font-size: 24px; cursor: pointer; filter: grayscale(1) opacity(0.4); transition: all 0.15s; }
+  .star.lit { filter: none; }
+
+  /* LOYALTY */
+  .loyalty-card {
+    background: linear-gradient(135deg, #1a1020, #0e1520);
+    border: 1px solid var(--gold-dim);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .loyalty-card::before {
+    content: '✦';
+    position: absolute;
+    font-size: 120px;
+    color: rgba(201,169,110,0.05);
+    right: -10px;
+    top: -20px;
+  }
+
+  .loyalty-level {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .loyalty-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+
+  .loyalty-points {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .points-num {
+    font-size: 38px;
+    font-weight: 300;
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+
+  .points-label { font-size: 13px; color: var(--text-muted); }
+
+  .progress-bar {
+    background: var(--surface2);
+    border-radius: 3px;
+    height: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* SUCCESS MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 28px 24px 36px;
+    width: 100%;
+    max-width: 430px;
+    text-align: center;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-icon { font-size: 52px; margin-bottom: 12px; }
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .modal-sub { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 24px; }
+
+  .payment-methods {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .payment-btn {
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .payment-btn:hover { border-color: var(--gold); }
+  .payment-btn span { font-size: 22px; }
+
+  .btn-close-modal {
+    width: 100%;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* SUCCESS STATE */
+  .success-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+    padding: 32px;
+  }
+  .success-overlay.open { display: flex; }
+
+  .success-icon {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(201,169,110,0.2), rgba(201,169,110,0.05));
+    border: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(201,169,110,0.3); }
+    50% { box-shadow: 0 0 0 16px rgba(201,169,110,0); }
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 2px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 16px;
+    opacity: 0.5;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="page-home">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo">Regi<span>Forge</span></div>
+        <div class="avatar" onclick="showPage('profile')">💆‍♀️</div>
+      </div>
+      <div class="greeting">Добро пожаловать, Малика ✨</div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-label">✦ Ваш салон</div>
+      <div class="hero-title">Запись<br>в три <em>клика</em></div>
+      <button class="btn-primary" onclick="showPage('book')">
+        📅 Записаться сейчас
+      </button>
+    </div>
+
+    <!-- Quick appointments -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Ближайшая запись</div>
+      </div>
+      <div class="appt-card">
+        <div class="appt-date-block">
+          <div class="appt-day">22</div>
+          <div class="appt-mon">мар</div>
+        </div>
+        <div class="appt-info">
+          <div class="appt-service">Стрижка + укладка</div>
+          <div class="appt-meta">
+            <span>🕐 14:00</span>
+            <span>💇 Зарина</span>
+          </div>
+        </div>
+        <div class="appt-status status-confirmed">✓ Подтверждено</div>
+      </div>
+    </div>
+
+    <!-- Popular services -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Популярные услуги</div>
+        <a class="section-link" onclick="showPage('book')">Все →</a>
+      </div>
+      <div class="services-grid">
+        <div class="service-card" onclick="showPage('book')">
+          <span class="service-icon">✂️</span>
+          <div class="service-name">Стрижка</div>
+          <div class="service-price">от 50 000 сум</div>
+          <div class="service-duration">45 мин</div>
+        </div>
+        <div class="service-card" onclick="showPage('book')">
+          <span class="service-icon">💅</span>
+          <div class="service-name">Маникюр</div>
+          <div class="service-price">от 40 000 сум</div>
+          <div class="service-duration">60 мин</div>
+        </div>
+        <div class="service-card" onclick="showPage('book')">
+          <span class="service-icon">🎨</span>
+          <div class="service-name">Окрашивание</div>
+          <div class="service-price">от 120 000 сум</div>
+          <div class="service-duration">120 мин</div>
+        </div>
+        <div class="service-card" onclick="showPage('book')">
+          <span class="service-icon">💆‍♀️</span>
+          <div class="service-name">Уход за бровями</div>
+          <div class="service-price">от 35 000 сум</div>
+          <div class="service-duration">40 мин</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loyalty block -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Ваши бонусы</div>
+      </div>
+      <div class="loyalty-card">
+        <div class="loyalty-level">✦ Постоянный клиент</div>
+        <div class="loyalty-name">Малика Р.</div>
+        <div class="loyalty-points">
+          <div class="points-num">340</div>
+          <div class="points-label">бонусных баллов</div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 68%;"></div>
+        </div>
+        <div class="progress-label">
+          <span>До VIP статуса</span>
+          <span>160 баллов</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="height: 10px;"></div>
+  </div>
+
+  <!-- BOOKING PAGE -->
+  <div class="page" id="page-book">
+    <div class="header">
+      <div class="header-top">
+        <button onclick="showPage('home')" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;">←</button>
+        <div class="logo" style="font-size:20px;">Запись</div>
+        <div style="width:40px;"></div>
+      </div>
+    </div>
+
+    <!-- Step 1: Services -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">1. Выберите услугу</div>
+      </div>
+      <div class="services-grid">
+        <div class="service-card" id="svc-1" onclick="selectService(1)">
+          <span class="service-icon">✂️</span>
+          <div class="service-name">Стрижка</div>
+          <div class="service-price">50 000 сум</div>
+          <div class="service-duration">45 мин</div>
+        </div>
+        <div class="service-card" id="svc-2" onclick="selectService(2)">
+          <span class="service-icon">💅</span>
+          <div class="service-name">Маникюр</div>
+          <div class="service-price">40 000 сум</div>
+          <div class="service-duration">60 мин</div>
+        </div>
+        <div class="service-card" id="svc-3" onclick="selectService(3)">
+          <span class="service-icon">🎨</span>
+          <div class="service-name">Окрашивание</div>
+          <div class="service-price">120 000 сум</div>
+          <div class="service-duration">120 мин</div>
+        </div>
+        <div class="service-card" id="svc-4" onclick="selectService(4)">
+          <span class="service-icon">💆‍♀️</span>
+          <div class="service-name">Брови</div>
+          <div class="service-price">35 000 сум</div>
+          <div class="service-duration">40 мин</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Step 2: Master -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">2. Мастер</div>
+      </div>
+      <div class="masters-row">
+        <div class="master-card" id="m-any" onclick="selectMaster('any')">
+          <div class="master-ava">🎯
+            <div class="master-badge">✨</div>
+          </div>
+          <div class="master-name">Любой</div>
+          <div class="master-spec">свободный</div>
+          <div class="master-rating">—</div>
+        </div>
+        <div class="master-card" id="m-1" onclick="selectMaster('1')">
+          <div class="master-ava">👩‍🦱
+            <div class="master-badge">⭐</div>
+          </div>
+          <div class="master-name">Зарина</div>
+          <div class="master-spec">Стилист</div>
+          <div class="master-rating">⭐ 4.9</div>
+        </div>
+        <div class="master-card" id="m-2" onclick="selectMaster('2')">
+          <div class="master-ava">👩‍🦰</div>
+          <div class="master-name">Нилуфар</div>
+          <div class="master-spec">Колорист</div>
+          <div class="master-rating">⭐ 4.8</div>
+        </div>
+        <div class="master-card" id="m-3" onclick="selectMaster('3')">
+          <div class="master-ava">👩</div>
+          <div class="master-name">Диля</div>
+          <div class="master-spec">Маникюр</div>
+          <div class="master-rating">⭐ 5.0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Step 3: Calendar -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">3. Дата</div>
+      </div>
+      <div class="calendar-wrap">
+        <div class="cal-header">
+          <div class="cal-month" id="cal-month-label">Март 2025</div>
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="prevMonth()">‹</button>
+            <button class="cal-nav-btn" onclick="nextMonth()">›</button>
+          </div>
+        </div>
+        <div class="cal-days-header">
+          <div class="cal-day-name">Пн</div>
+          <div class="cal-day-name">Вт</div>
+          <div class="cal-day-name">Ср</div>
+          <div class="cal-day-name">Чт</div>
+          <div class="cal-day-name">Пт</div>
+          <div class="cal-day-name">Сб</div>
+          <div class="cal-day-name">Вс</div>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Step 4: Time -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">4. Время</div>
+      </div>
+      <div class="slots-grid">
+        <div class="slot" onclick="selectSlot(this)">09:00</div>
+        <div class="slot" onclick="selectSlot(this)">10:00</div>
+        <div class="slot busy">11:00</div>
+        <div class="slot" onclick="selectSlot(this)">12:00</div>
+        <div class="slot busy">13:00</div>
+        <div class="slot" onclick="selectSlot(this)">14:00</div>
+        <div class="slot" onclick="selectSlot(this)">15:00</div>
+        <div class="slot busy">16:00</div>
+        <div class="slot" onclick="selectSlot(this)">17:00</div>
+        <div class="slot" onclick="selectSlot(this)">18:00</div>
+        <div class="slot" onclick="selectSlot(this)">19:00</div>
+        <div class="slot busy">20:00</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Summary -->
+    <div class="summary-card">
+      <div class="summary-title">Ваша запись</div>
+      <div class="summary-row">
+        <span class="summary-label">Услуга</span>
+        <span class="summary-value" id="sum-svc">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Мастер</span>
+        <span class="summary-value" id="sum-master">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Дата и время</span>
+        <span class="summary-value" id="sum-dt">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Стоимость</span>
+        <span class="summary-value gold" id="sum-price">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Депозит (30%)</span>
+        <span class="summary-value gold" id="sum-deposit">—</span>
+      </div>
+    </div>
+
+    <div class="deposit-note">
+      🔒 Депозит подтверждает вашу запись. Оплата через Click или Payme.
+      Напоминание придёт за 24 ч и за 2 ч до визита.
+    </div>
+
+    <div class="bottom-action">
+      <button class="btn-book" id="book-btn" disabled onclick="openPayment()">
+        💳 Оплатить депозит
+      </button>
+    </div>
+  </div>
+
+  <!-- MY APPOINTMENTS PAGE -->
+  <div class="page" id="page-appts">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo">Мои записи</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <!-- Review prompt -->
+      <div class="review-prompt">
+        <div class="review-prompt-icon">⭐</div>
+        <div class="review-prompt-text">
+          <div class="review-prompt-title">Как прошёл визит?</div>
+          <div class="review-prompt-sub">Стрижка с Зариной • 18 марта</div>
+          <div class="stars-row" id="stars-row">
+            <span class="star" onclick="rateStar(1)">★</span>
+            <span class="star" onclick="rateStar(2)">★</span>
+            <span class="star" onclick="rateStar(3)">★</span>
+            <span class="star" onclick="rateStar(4)">★</span>
+            <span class="star" onclick="rateStar(5)">★</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming -->
+      <div class="section-header" style="margin-top:8px;">
+        <div class="section-title">Предстоящие</div>
+      </div>
+      <div class="appt-card">
+        <div class="appt-date-block">
+          <div class="appt-day">22</div>
+          <div class="appt-mon">мар</div>
+        </div>
+        <div class="appt-info">
+          <div class="appt-service">Стрижка + укладка</div>
+          <div class="appt-meta">
+            <span>🕐 14:00</span>
+            <span>💇 Зарина</span>
+          </div>
+        </div>
+        <div class="appt-status status-confirmed">✓ Подтвержд.</div>
+      </div>
+
+      <!-- Past -->
+      <div class="section-header" style="margin-top:16px;">
+        <div class="section-title">История</div>
+      </div>
+      <div class="appt-card">
+        <div class="appt-date-block">
+          <div class="appt-day">18</div>
+          <div class="appt-mon">мар</div>
+        </div>
+        <div class="appt-info">
+          <div class="appt-service">Маникюр гель</div>
+          <div class="appt-meta">
+            <span>🕐 11:00</span>
+            <span>💅 Диля</span>
+          </div>
+        </div>
+        <div class="appt-status status-done">Завершено</div>
+      </div>
+      <div class="appt-card">
+        <div class="appt-date-block">
+          <div class="appt-day">05</div>
+          <div class="appt-mon">мар</div>
+        </div>
+        <div class="appt-info">
+          <div class="appt-service">Окрашивание</div>
+          <div class="appt-meta">
+            <span>🕐 15:00</span>
+            <span>💇 Нилуфар</span>
+          </div>
+        </div>
+        <div class="appt-status status-done">Завершено</div>
+      </div>
+      <div class="appt-card">
+        <div class="appt-date-block">
+          <div class="appt-day">20</div>
+          <div class="appt-mon">фев</div>
+        </div>
+        <div class="appt-info">
+          <div class="appt-service">Брови</div>
+          <div class="appt-meta">
+            <span>🕐 12:00</span>
+            <span>💇 Зарина</span>
+          </div>
+        </div>
+        <div class="appt-status status-cancelled">Отменено</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div class="page" id="page-profile">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo">Профиль</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <!-- Loyalty card big -->
+      <div class="loyalty-card">
+        <div class="loyalty-level">✦ Постоянный клиент</div>
+        <div class="loyalty-name">Малика Расулова</div>
+        <div class="loyalty-points">
+          <div class="points-num">340</div>
+          <div class="points-label">бонусных баллов</div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 68%;"></div>
+        </div>
+        <div class="progress-label">
+          <span>До VIP статуса</span>
+          <span>160 баллов</span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;">
+          <div style="font-size:22px;font-family:'Cormorant Garamond',serif;color:var(--gold);">12</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Визитов</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;">
+          <div style="font-size:22px;font-family:'Cormorant Garamond',serif;color:var(--gold);">580K</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Потрачено</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;">
+          <div style="font-size:22px;font-family:'Cormorant Garamond',serif;color:var(--gold);">4.9</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Рейтинг</div>
+        </div>
+      </div>
+
+      <!-- My fav master -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;">
+        <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;font-weight:500;">Любимый мастер</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:44px;height:44px;border-radius:50%;background:var(--surface2);border:2px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:20px;">👩‍🦱</div>
+          <div>
+            <div style="font-weight:500;margin-bottom:2px;">Зарина</div>
+            <div style="font-size:12px;color:var(--text-muted);">Стилист • 8 визитов</div>
+          </div>
+          <div style="margin-left:auto;color:var(--gold);">⭐ 4.9</div>
+        </div>
+      </div>
+
+      <!-- Birthday bonus -->
+      <div style="background:linear-gradient(135deg,rgba(212,120,154,0.1),rgba(201,169,110,0.06));border:1px solid var(--pink-dim);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:30px;">🎂</span>
+        <div>
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">Бонус на день рождения</div>
+          <div style="font-size:12px;color:var(--text-muted);">+100 баллов начислятся 15 апреля</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="nav-home" onclick="showPage('home')">
+    <div class="nav-icon">🏠</div>
+    <div class="nav-label">Главная</div>
+  </div>
+  <div class="nav-item" id="nav-book" onclick="showPage('book')">
+    <div class="nav-icon">📅</div>
+    <div class="nav-label">Запись</div>
+  </div>
+  <div class="nav-item" id="nav-appts" onclick="showPage('appts')">
+    <div class="nav-icon">📋</div>
+    <div class="nav-label">Визиты</div>
+  </div>
+  <div class="nav-item" id="nav-profile" onclick="showPage('profile')">
+    <div class="nav-icon">👤</div>
+    <div class="nav-label">Профиль</div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="payment-modal">
+  <div class="modal">
+    <div class="modal-icon">💳</div>
+    <div class="modal-title">Оплата депозита</div>
+    <div class="modal-sub">Выберите способ оплаты.<br>Депозит: <strong id="modal-deposit-amount">—</strong></div>
+    <div class="payment-methods">
+      <button class="payment-btn" onclick="confirmBooking()">
+        <span>🟢</span>
+        Click
+      </button>
+      <button class="payment-btn" onclick="confirmBooking()">
+        <span>🔵</span>
+        Payme
+      </button>
+    </div>
+    <button class="btn-close-modal" onclick="closePayment()">Отмена</button>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="success-overlay">
+  <div class="success-icon">✓</div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;">Запись подтверждена!</div>
+  <div style="font-size:14px;color:var(--text-muted);line-height:1.6;max-width:280px;text-align:center;">
+    Ждём вас в салоне. Напоминание придёт за 24 ч и за 2 ч до визита.
+  </div>
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin:8px 0;">
+    <div class="chip">✂️ <span id="success-svc">Стрижка</span></div>
+    <div class="chip">👩‍🦱 <span id="success-master">Зарина</span></div>
+    <div class="chip">📅 <span id="success-dt">22 марта 14:00</span></div>
+  </div>
+  <button class="btn-primary" onclick="closeSuccess()" style="margin-top:16px;">На главную</button>
+</div>
+
+<script>
+  // Navigation
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    const navEl = document.getElementById('nav-' + name);
+    if (navEl) navEl.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // Booking state
+  let bookingState = { service: null, master: null, date: null, time: null };
+  const services = { 1: { name: 'Стрижка', price: 50000 }, 2: { name: 'Маникюр', price: 40000 }, 3: { name: 'Окрашивание', price: 120000 }, 4: { name: 'Брови', price: 35000 } };
+  const masters = { any: 'Любой свободный', '1': 'Зарина', '2': 'Нилуфар', '3': 'Диля' };
+
+  function selectService(id) {
+    document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('svc-' + id).classList.add('selected');
+    bookingState.service = id;
+    updateSummary();
+  }
+
+  function selectMaster(id) {
+    document.querySelectorAll('.master-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('m-' + id).classList.add('selected');
+    bookingState.master = id;
+    updateSummary();
+  }
+
+  function selectSlot(el) {
+    document.querySelectorAll('.slot:not(.busy)').forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+    bookingState.time = el.textContent;
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const s = bookingState;
+    const svc = s.service ? services[s.service] : null;
+    document.getElementById('sum-svc').textContent = svc ? svc.name : '—';
+    document.getElementById('sum-master').textContent = s.master ? masters[s.master] : '—';
+    document.getElementById('sum-dt').textContent = s.date && s.time ? `${s.date} в ${s.time}` : '—';
+    if (svc) {
+      document.getElementById('sum-price').textContent = svc.price.toLocaleString('ru') + ' сум';
+      document.getElementById('sum-deposit').textContent = Math.round(svc.price * 0.3).toLocaleString('ru') + ' сум';
+    } else {
+      document.getElementById('sum-price').textContent = '—';
+      document.getElementById('sum-deposit').textContent = '—';
+    }
+    const ready = s.service && s.master && s.date && s.time;
+    document.getElementById('book-btn').disabled = !ready;
+  }
+
+  function openPayment() {
+    const svc = services[bookingState.service];
+    document.getElementById('modal-deposit-amount').textContent = Math.round(svc.price * 0.3).toLocaleString('ru') + ' сум';
+    document.getElementById('payment-modal').classList.add('open');
+  }
+
+  function closePayment() {
+    document.getElementById('payment-modal').classList.remove('open');
+  }
+
+  function confirmBooking() {
+    closePayment();
+    const svc = services[bookingState.service];
+    document.getElementById('success-svc').textContent = svc.name;
+    document.getElementById('success-master').textContent = masters[bookingState.master];
+    document.getElementById('success-dt').textContent = (bookingState.date || '22 марта') + ' ' + bookingState.time;
+    document.getElementById('success-overlay').classList.add('open');
+  }
+
+  function closeSuccess() {
+    document.getElementById('success-overlay').classList.remove('open');
+    bookingState = { service: null, master: null, date: null, time: null };
+    document.querySelectorAll('.service-card,.master-card,.slot').forEach(el => el.classList.remove('selected'));
+    updateSummary();
+    showPage('home');
+  }
+
+  // Calendar
+  const months = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  const today = new Date();
+  let calYear = today.getFullYear();
+  let calMonth = today.getMonth();
+
+  function renderCal() {
+    document.getElementById('cal-month-label').textContent = months[calMonth] + ' ' + calYear;
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+    const first = new Date(calYear, calMonth, 1);
+    let startDay = first.getDay() - 1;
+    if (startDay < 0) startDay = 6;
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const hasSlotsArr = [3,5,8,10,12,15,18,20,22,25,28];
+
+    for (let i = 0; i < startDay; i++) {
+      const d = document.createElement('div');
+      d.className = 'cal-day empty';
+      grid.appendChild(d);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const d = document.createElement('div');
+      d.className = 'cal-day';
+      d.textContent = day;
+      const thisDate = new Date(calYear, calMonth, day);
+      if (thisDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+        d.classList.add('past');
+      }
+      if (day === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear()) {
+        d.classList.add('today');
+      }
+      if (hasSlotsArr.includes(day)) d.classList.add('has-slots');
+      d.addEventListener('click', () => {
+        document.querySelectorAll('.cal-day').forEach(x => x.classList.remove('selected'));
+        d.classList.add('selected');
+        bookingState.date = day + ' ' + months[calMonth].toLowerCase().slice(0, 3);
+        updateSummary();
+      });
+      grid.appendChild(d);
+    }
+  }
+
+  function prevMonth() {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCal();
+  }
+  function nextMonth() {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCal();
+  }
+
+  renderCal();
+
+  // Stars
+  function rateStar(n) {
+    const stars = document.querySelectorAll('#stars-row .star');
+    stars.forEach((s, i) => s.classList.toggle('lit', i < n));
+    setTimeout(() => {
+      document.querySelector('.review-prompt').style.opacity = '0.5';
+      document.querySelector('.review-prompt').style.pointerEvents = 'none';
+    }, 600);
+  }
+</script>
+</body>
+</html>

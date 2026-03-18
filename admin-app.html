@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RegiForge — Администратор</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1a;
+    --surface: #111827;
+    --surface2: #1a2336;
+    --surface3: #243049;
+    --border: #1e2d45;
+    --blue: #3b82f6;
+    --blue-dim: #1e3a5f;
+    --teal: #2dd4bf;
+    --teal-dim: #0d3d38;
+    --red: #ef4444;
+    --red-dim: #3d1515;
+    --amber: #f59e0b;
+    --amber-dim: #3d2a00;
+    --green: #22c55e;
+    --green-dim: #0d3320;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #334155;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    overflow-x: hidden;
+  }
+
+  /* Grid texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.02) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 20px 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .logo span {
+    color: var(--blue);
+  }
+
+  .admin-badge {
+    background: var(--blue-dim);
+    color: var(--blue);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(59,130,246,0.2);
+  }
+
+  /* PAGES */
+  .page { display: none; padding-bottom: 90px; }
+  .page.active { display: block; }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 14px 16px 0;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 60px; height: 60px;
+    border-radius: 0 0 0 60px;
+    opacity: 0.06;
+  }
+
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.teal::before { background: var(--teal); }
+  .stat-card.amber::before { background: var(--amber); }
+  .stat-card.green::before { background: var(--green); }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-value.blue { color: var(--blue); }
+  .stat-value.teal { color: var(--teal); }
+  .stat-value.amber { color: var(--amber); }
+  .stat-value.green { color: var(--green); }
+
+  .stat-delta {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .delta-up { color: var(--green); }
+  .delta-down { color: var(--red); }
+
+  /* SECTION */
+  .section { padding: 20px 16px 0; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .section-link {
+    font-size: 12px;
+    color: var(--blue);
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  /* ALERT (Red Zone) */
+  .alert-card {
+    background: var(--red-dim);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    animation: pulseAlert 3s infinite;
+  }
+
+  @keyframes pulseAlert {
+    0%, 100% { border-color: rgba(239,68,68,0.3); }
+    50% { border-color: rgba(239,68,68,0.6); }
+  }
+
+  .alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+
+  .alert-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--red);
+    margin-bottom: 3px;
+  }
+
+  .alert-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+  .alert-action {
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--red);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-bottom: 1px solid rgba(239,68,68,0.4);
+    padding-bottom: 1px;
+  }
+
+  /* SCHEDULE TODAY */
+  .schedule-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .appt-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .appt-time {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--blue);
+    min-width: 44px;
+  }
+
+  .appt-detail { flex: 1; }
+
+  .appt-client { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .appt-svc { font-size: 11px; color: var(--text-muted); }
+
+  .appt-master-badge {
+    font-size: 11px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 20px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .appt-status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-active { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .dot-upcoming { background: var(--blue); }
+  .dot-done { background: var(--text-dim); }
+
+  .appt-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+
+  .btn-sm.primary { background: var(--blue-dim); border-color: rgba(59,130,246,0.3); color: var(--blue); }
+  .btn-sm.danger { background: var(--red-dim); border-color: rgba(239,68,68,0.25); color: var(--red); }
+  .btn-sm.success { background: var(--green-dim); border-color: rgba(34,197,94,0.25); color: var(--green); }
+
+  /* MASTERS WORKLOAD */
+  .master-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .master-ava-admin {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .master-info { flex: 1; }
+  .master-name-admin { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .master-load-bar {
+    height: 4px;
+    background: var(--surface3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .master-load-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s ease;
+  }
+  .fill-blue { background: var(--blue); }
+  .fill-teal { background: var(--teal); }
+  .fill-amber { background: var(--amber); }
+  .fill-green { background: var(--green); }
+
+  .master-load-pct {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  .master-stats-mini {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .master-revenue { font-size: 13px; font-weight: 600; }
+  .master-rating-admin { font-size: 11px; color: var(--amber); }
+
+  /* CHART */
+  .chart-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .chart-label { font-size: 12px; color: var(--text-muted); }
+
+  .chart-total {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 80px;
+  }
+
+  .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
+    min-height: 4px;
+  }
+
+  .bar:hover { opacity: 0.8; }
+  .bar.blue { background: var(--blue); }
+  .bar.highlighted { background: var(--teal); }
+
+  .bar-day { font-size: 9px; color: var(--text-dim); text-align: center; }
+
+  /* CLIENTS */
+  .client-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .client-row:active { border-color: var(--blue); }
+
+  .client-ava {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .client-status-ring {
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+  }
+
+  .ring-vip { border-color: var(--amber); }
+  .ring-regular { border-color: var(--blue); }
+  .ring-risk { border-color: var(--red); }
+
+  .client-info { flex: 1; }
+  .client-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .client-meta { font-size: 11px; color: var(--text-muted); }
+
+  .client-ltv { font-size: 13px; font-weight: 600; color: var(--teal); }
+  .client-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  .badge-vip { background: var(--amber-dim); color: var(--amber); }
+  .badge-regular { background: var(--blue-dim); color: var(--blue); }
+  .badge-risk { background: var(--red-dim); color: var(--red); animation: pulseAlert 2s infinite; }
+
+  /* QUICK ACTIONS */
+  .quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 14px 16px 0;
+  }
+
+  .quick-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+
+  .quick-btn:active { transform: scale(0.97); border-color: var(--blue); }
+
+  .quick-icon { font-size: 22px; }
+  .quick-title { font-size: 13px; font-weight: 600; }
+  .quick-sub { font-size: 11px; color: var(--text-muted); }
+
+  /* INVENTORY */
+  .inventory-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .inv-icon { font-size: 22px; }
+  .inv-info { flex: 1; }
+  .inv-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .inv-bar {
+    height: 3px;
+    background: var(--surface3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .inv-bar-fill { height: 100%; border-radius: 2px; }
+  .fill-ok { background: var(--green); }
+  .fill-low { background: var(--amber); }
+  .fill-critical { background: var(--red); }
+
+  .inv-qty {
+    font-size: 11px;
+    margin-top: 3px;
+    color: var(--text-muted);
+  }
+
+  .inv-status {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  .status-ok { background: var(--green-dim); color: var(--green); }
+  .status-low { background: var(--amber-dim); color: var(--amber); }
+  .status-critical { background: var(--red-dim); color: var(--red); }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(10, 15, 26, 0.97);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 16px;
+    z-index: 100;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: var(--text-dim);
+    transition: color 0.2s;
+    padding: 4px 12px;
+    border-radius: var(--radius-sm);
+  }
+
+  .nav-item.active { color: var(--blue); }
+  .nav-icon { font-size: 19px; position: relative; }
+  .nav-label { font-size: 10px; font-weight: 500; }
+
+  .nav-badge {
+    position: absolute;
+    top: -3px; right: -6px;
+    background: var(--red);
+    color: white;
+    font-size: 8px;
+    font-weight: 700;
+    min-width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+  }
+
+  /* ADD BOOKING MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 1px solid rgba(59,130,246,0.3);
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 32px;
+    width: 100%;
+    max-width: 430px;
+    animation: slideUp 0.25s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-handle {
+    width: 36px; height: 4px;
+    background: var(--surface3);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .form-group { margin-bottom: 14px; }
+
+  .form-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus { border-color: var(--blue); }
+
+  select.form-input { appearance: none; cursor: pointer; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .form-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+
+  .toggle-switch {
+    width: 36px; height: 20px;
+    background: var(--surface3);
+    border-radius: 10px;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle-switch.on { background: var(--blue); }
+
+  .toggle-thumb {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 16px; height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: left 0.2s;
+  }
+
+  .toggle-switch.on .toggle-thumb { left: 18px; }
+
+  .toggle-label { font-size: 13px; }
+
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-top: 4px;
+  }
+
+  .btn-submit:active { opacity: 0.85; }
+
+  .debt-warning {
+    background: var(--amber-dim);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--amber);
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .debt-warning.show { display: flex; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 400;
+    transition: transform 0.3s ease;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* TAG FILTER */
+  .tag-filter {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    margin-bottom: 12px;
+    scrollbar-width: none;
+  }
+  .tag-filter::-webkit-scrollbar { display: none; }
+
+  .tag {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .tag.active {
+    background: var(--blue-dim);
+    border-color: rgba(59,130,246,0.4);
+    color: var(--blue);
+  }
+
+  /* KPI Row */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 0 16px;
+    margin-top: 14px;
+  }
+
+  .kpi-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    text-align: center;
+  }
+
+  .kpi-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--teal);
+    line-height: 1;
+  }
+
+  .kpi-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- DASHBOARD PAGE -->
+  <div class="page active" id="page-dashboard">
+
+    <div class="header">
+      <div>
+        <div class="logo">Regi<span>Forge</span></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Beauty Studio Pro • Самарканд</div>
+      </div>
+      <div class="admin-badge">Админ</div>
+    </div>
+
+    <!-- Red Zone Alert -->
+    <div class="section">
+      <div class="alert-card">
+        <div class="alert-icon">🔴</div>
+        <div style="flex:1;">
+          <div class="alert-title">⚠ Красная зона — Отток клиентов</div>
+          <div class="alert-text">23% базы не записывалось более 45 дней. Порог: 20%. Рекомендуется авто-рассылка со скидкой.</div>
+          <div class="alert-action" onclick="showToast('📢 Рассылка запущена для 14 клиентов')">
+            Запустить рассылку →
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card blue">
+        <div class="stat-label">Выручка сегодня</div>
+        <div class="stat-value blue">1.24M</div>
+        <div class="stat-delta">
+          <span class="delta-up">↑ 18%</span>
+          <span>vs вчера</span>
+        </div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-label">Записей сегодня</div>
+        <div class="stat-value teal">12</div>
+        <div class="stat-delta">
+          <span class="delta-up">↑ 3</span>
+          <span>выполнено</span>
+        </div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Неявок (этот мес.)</div>
+        <div class="stat-value amber">2%</div>
+        <div class="stat-delta">
+          <span class="delta-up">↓ 28%</span>
+          <span>благодаря депозитам</span>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Новых клиентов</div>
+        <div class="stat-value green">7</div>
+        <div class="stat-delta">
+          <span>эта неделя</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue chart -->
+    <div class="section">
+      <div class="chart-wrap">
+        <div class="chart-header">
+          <div>
+            <div class="chart-label">ВЫРУЧКА ЗА НЕДЕЛЮ</div>
+            <div class="chart-total">6.82M сум</div>
+          </div>
+          <div style="font-size:11px;color:var(--teal);">↑ 12% к пр. нед.</div>
+        </div>
+        <div class="chart-bars" id="chart-bars"></div>
+        <div style="display:flex;gap:5px;margin-top:4px;" id="chart-labels"></div>
+      </div>
+    </div>
+
+    <!-- Masters -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Мастера • Загрузка</div>
+        <a class="section-link" onclick="showPage('masters')">Все →</a>
+      </div>
+      <div class="master-row">
+        <div class="master-ava-admin">👩‍🦱</div>
+        <div class="master-info">
+          <div class="master-name-admin">Зарина</div>
+          <div class="master-load-bar"><div class="master-load-fill fill-blue" style="width:87%;"></div></div>
+          <div class="master-load-pct">87% загрузки • 5 записей</div>
+        </div>
+        <div class="master-stats-mini">
+          <div class="master-revenue">420K</div>
+          <div class="master-rating-admin">⭐ 4.9</div>
+        </div>
+      </div>
+      <div class="master-row">
+        <div class="master-ava-admin">👩‍🦰</div>
+        <div class="master-info">
+          <div class="master-name-admin">Нилуфар</div>
+          <div class="master-load-bar"><div class="master-load-fill fill-teal" style="width:60%;"></div></div>
+          <div class="master-load-pct">60% загрузки • 3 записи</div>
+        </div>
+        <div class="master-stats-mini">
+          <div class="master-revenue">280K</div>
+          <div class="master-rating-admin">⭐ 4.8</div>
+        </div>
+      </div>
+      <div class="master-row">
+        <div class="master-ava-admin">👩</div>
+        <div class="master-info">
+          <div class="master-name-admin">Диля</div>
+          <div class="master-load-bar"><div class="master-load-fill fill-amber" style="width:40%;"></div></div>
+          <div class="master-load-pct">40% загрузки • 2 записи</div>
+        </div>
+        <div class="master-stats-mini">
+          <div class="master-revenue">150K</div>
+          <div class="master-rating-admin">⭐ 5.0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock alerts -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Склад</div>
+        <a class="section-link" onclick="showPage('inventory')">Все →</a>
+      </div>
+      <div class="inventory-item">
+        <div class="inv-icon">🎨</div>
+        <div class="inv-info">
+          <div class="inv-name">Крем-краска Matrix</div>
+          <div class="inv-bar"><div class="inv-bar-fill fill-critical" style="width:12%;"></div></div>
+          <div class="inv-qty">Остаток: 120 мл · Мин: 500 мл</div>
+        </div>
+        <div class="inv-status status-critical">КРИТИЧНО</div>
+      </div>
+      <div class="inventory-item">
+        <div class="inv-icon">💊</div>
+        <div class="inv-info">
+          <div class="inv-name">Оксидант 6%</div>
+          <div class="inv-bar"><div class="inv-bar-fill fill-low" style="width:35%;"></div></div>
+          <div class="inv-qty">Остаток: 350 мл · Мин: 500 мл</div>
+        </div>
+        <div class="inv-status status-low">МАЛО</div>
+      </div>
+    </div>
+
+    <div style="height:10px;"></div>
+  </div>
+
+  <!-- SCHEDULE PAGE -->
+  <div class="page" id="page-schedule">
+    <div class="header" style="margin-bottom:0;">
+      <div class="logo" style="font-size:18px;">Расписание</div>
+      <button onclick="openAddBooking()" style="background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);padding:8px 14px;font-size:13px;font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;">+ Добавить</button>
+    </div>
+
+    <div style="padding:14px 16px 0;">
+      <!-- Date nav -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <button onclick="prevDay()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:4px;">‹</button>
+        <div style="text-align:center;">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;" id="sched-date">Среда, 19 марта</div>
+          <div style="font-size:11px;color:var(--text-muted);">12 записей · выручка: 1.24M сум</div>
+        </div>
+        <button onclick="nextDay()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:4px;">›</button>
+      </div>
+
+      <div class="tag-filter">
+        <div class="tag active">Все мастера</div>
+        <div class="tag" onclick="filterTag(this)">👩‍🦱 Зарина</div>
+        <div class="tag" onclick="filterTag(this)">👩‍🦰 Нилуфар</div>
+        <div class="tag" onclick="filterTag(this)">👩 Диля</div>
+      </div>
+
+      <div class="schedule-list">
+        <div class="appt-item" style="border-left:3px solid var(--green);">
+          <div class="appt-time">09:00</div>
+          <div class="appt-detail">
+            <div class="appt-client">Камола М. · Стрижка</div>
+            <div class="appt-svc">60 000 сум · 45 мин</div>
+            <div class="appt-actions">
+              <button class="btn-sm success" onclick="showToast('✅ Визит отмечен как завершённый')">✓ Завершить</button>
+              <button class="btn-sm" onclick="showToast('📝 Перенос записи')">Перенос</button>
+            </div>
+          </div>
+          <div>
+            <div class="appt-master-badge">Зарина</div>
+            <div style="text-align:right;margin-top:6px;"><div class="appt-status-dot dot-done"></div></div>
+          </div>
+        </div>
+
+        <div class="appt-item" style="border-left:3px solid var(--blue);box-shadow:0 0 0 1px rgba(59,130,246,0.15);">
+          <div class="appt-time" style="color:var(--teal);">11:00</div>
+          <div class="appt-detail">
+            <div class="appt-client">Шахло Р. · Маникюр гель</div>
+            <div class="appt-svc">80 000 сум · 60 мин <span style="color:var(--green);">· депозит ✓</span></div>
+            <div class="appt-actions">
+              <button class="btn-sm success" onclick="showToast('✅ Визит отмечен как завершённый')">✓ Завершить</button>
+              <button class="btn-sm danger" onclick="showToast('❌ Запись отменена')">Отмена</button>
+            </div>
+          </div>
+          <div>
+            <div class="appt-master-badge">Диля</div>
+            <div style="text-align:right;margin-top:6px;"><div class="appt-status-dot dot-active"></div></div>
+          </div>
+        </div>
+
+        <div class="appt-item">
+          <div class="appt-time">13:00</div>
+          <div class="appt-detail">
+            <div class="appt-client">Малика Н. · Окрашивание</div>
+            <div class="appt-svc">150 000 сум · 120 мин</div>
+            <div class="appt-actions">
+              <button class="btn-sm primary" onclick="showToast('📲 Напоминание отправлено клиенту')">📲 Напомнить</button>
+              <button class="btn-sm danger" onclick="showToast('❌ Запись отменена')">Отмена</button>
+            </div>
+          </div>
+          <div>
+            <div class="appt-master-badge">Нилуфар</div>
+            <div style="text-align:right;margin-top:6px;"><div class="appt-status-dot dot-upcoming"></div></div>
+          </div>
+        </div>
+
+        <div class="appt-item">
+          <div class="appt-time">15:00</div>
+          <div class="appt-detail">
+            <div class="appt-client">Зебо А. · Брови</div>
+            <div class="appt-svc">40 000 сум · 40 мин</div>
+            <div class="appt-actions">
+              <button class="btn-sm primary" onclick="showToast('📲 Напоминание отправлено клиенту')">📲 Напомнить</button>
+              <button class="btn-sm danger" onclick="showToast('❌ Запись отменена')">Отмена</button>
+            </div>
+          </div>
+          <div>
+            <div class="appt-master-badge">Зарина</div>
+            <div style="text-align:right;margin-top:6px;"><div class="appt-status-dot dot-upcoming"></div></div>
+          </div>
+        </div>
+
+        <div class="appt-item">
+          <div class="appt-time">17:00</div>
+          <div class="appt-detail">
+            <div class="appt-client">Мухаббат Т. · Стрижка</div>
+            <div class="appt-svc">55 000 сум · 45 мин <span style="color:var(--green);">· депозит ✓</span></div>
+            <div class="appt-actions">
+              <button class="btn-sm primary" onclick="showToast('📲 Напоминание отправлено клиенту')">📲 Напомнить</button>
+              <button class="btn-sm danger" onclick="showToast('❌ Запись отменена')">Отмена</button>
+            </div>
+          </div>
+          <div>
+            <div class="appt-master-badge">Нилуфар</div>
+            <div style="text-align:right;margin-top:6px;"><div class="appt-status-dot dot-upcoming"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENTS PAGE -->
+  <div class="page" id="page-clients">
+    <div class="header">
+      <div class="logo" style="font-size:18px;">Клиенты</div>
+      <div style="font-size:12px;color:var(--text-muted);">Всего: 147</div>
+    </div>
+
+    <div class="section">
+      <input type="text" class="form-input" placeholder="🔍  Поиск по имени или номеру..." style="margin-bottom:12px;">
+
+      <div class="tag-filter">
+        <div class="tag active">Все</div>
+        <div class="tag" onclick="filterTag(this)">⭐ VIP</div>
+        <div class="tag" onclick="filterTag(this)">👥 Постоянные</div>
+        <div class="tag" onclick="filterTag(this)">🔴 Риск оттока</div>
+        <div class="tag" onclick="filterTag(this)">💳 Должники</div>
+      </div>
+
+      <div class="client-row" onclick="showToast('👤 Открыт профиль: Малика Расулова')">
+        <div class="client-ava">💆‍♀️<div class="client-status-ring ring-regular"></div></div>
+        <div class="client-info">
+          <div class="client-name">Малика Расулова</div>
+          <div class="client-meta">12 визитов · последний: 3 дня назад</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="client-ltv">580K</div>
+          <div class="client-badge badge-regular">Постоян.</div>
+        </div>
+      </div>
+
+      <div class="client-row" onclick="showToast('👤 Открыт профиль: Шахло Рашидова')">
+        <div class="client-ava">👩<div class="client-status-ring ring-vip"></div></div>
+        <div class="client-info">
+          <div class="client-name">Шахло Рашидова</div>
+          <div class="client-meta">24 визита · последний: вчера</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="client-ltv">1.2M</div>
+          <div class="client-badge badge-vip">VIP</div>
+        </div>
+      </div>
+
+      <div class="client-row" onclick="showToast('⚠ Риск оттока! Последний визит 52 дня назад')">
+        <div class="client-ava">🧕<div class="client-status-ring ring-risk"></div></div>
+        <div class="client-info">
+          <div class="client-name">Гулнора Хасанова</div>
+          <div class="client-meta">5 визитов · последний: 52 дня назад ⚠</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="client-ltv">180K</div>
+          <div class="client-badge badge-risk">Отток</div>
+        </div>
+      </div>
+
+      <div class="client-row" onclick="showToast('👤 Открыт профиль: Феруза Алиева')">
+        <div class="client-ava">👩‍🦰<div class="client-status-ring ring-regular"></div></div>
+        <div class="client-info">
+          <div class="client-name">Феруза Алиева</div>
+          <div class="client-meta">8 визитов · последний: 7 дней назад</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="client-ltv">320K</div>
+          <div class="client-badge badge-regular">Постоян.</div>
+        </div>
+      </div>
+
+      <div class="client-row" onclick="showToast('⚠ Долг 45 000 сум! Решение за администратором')">
+        <div class="client-ava">💁<div class="client-status-ring ring-risk"></div></div>
+        <div class="client-info">
+          <div class="client-name">Зебо Азимова</div>
+          <div class="client-meta">3 визита · долг: 45 000 сум ⚠</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="client-ltv" style="color:var(--red);">−45K</div>
+          <div class="client-badge badge-risk">Долг</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS PAGE -->
+  <div class="page" id="page-analytics">
+    <div class="header">
+      <div class="logo" style="font-size:18px;">Аналитика</div>
+      <div style="font-size:11px;color:var(--text-muted);">Март 2025</div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-block">
+        <div class="kpi-num">28.5M</div>
+        <div class="kpi-label">Выручка</div>
+      </div>
+      <div class="kpi-block">
+        <div class="kpi-num">89%</div>
+        <div class="kpi-label">Конверсия</div>
+      </div>
+      <div class="kpi-block">
+        <div class="kpi-num">2%</div>
+        <div class="kpi-label">Неявки</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Топ-5 услуг</div>
+      </div>
+      <div class="chart-wrap">
+        <div id="services-bars"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Выручка по мастерам</div>
+      </div>
+
+      <div class="master-row">
+        <div class="master-ava-admin">👩‍🦱</div>
+        <div class="master-info">
+          <div class="master-name-admin">Зарина · KPI 8%</div>
+          <div class="master-load-bar"><div class="master-load-fill fill-blue" style="width:72%;"></div></div>
+          <div class="master-load-pct">12.8M сум · 68 визитов</div>
+        </div>
+        <div class="master-stats-mini">
+          <div class="master-revenue" style="color:var(--blue);">1.02M</div>
+          <div style="font-size:10px;color:var(--text-muted);">ФОТ</div>
+        </div>
+      </div>
+
+      <div class="master-row">
+        <div class="master-ava-admin">👩‍🦰</div>
+        <div class="master-info">
+          <div class="master-name-admin">Нилуфар · KPI 7%</div>
+          <div class="master-load-bar"><div class="master-load-fill fill-teal" style="width:55%;"></div></div>
+          <div class="master-load-pct">9.8M сум · 44 визита</div>
+        </div>
+        <div class="master-stats-mini">
+          <div class="master-revenue" style="color:var(--teal);">686K</div>
+          <div style="font-size:10px;color:var(--text-muted);">ФОТ</div>
+        </div>
+      </div>
+
+      <div class="master-row">
+        <div class="master-ava-admin">👩</div>
+        <div class="master-info">
+          <div class="master-name-admin">Диля · KPI 9%</div>
+          <div class="master-load-bar"><div class="master-load-fill fill-amber" style="width:38%;"></div></div>
+          <div class="master-load-pct">5.9M сум · 52 визита</div>
+        </div>
+        <div class="master-stats-mini">
+          <div class="master-revenue" style="color:var(--amber);">531K</div>
+          <div style="font-size:10px;color:var(--text-muted);">ФОТ</div>
+        </div>
+      </div>
+
+      <!-- Outflow prediction -->
+      <div class="section-header" style="margin-top:20px;">
+        <div class="section-title">Прогноз оттока</div>
+        <div style="font-size:12px;background:var(--red-dim);color:var(--red);padding:3px 8px;border-radius:4px;font-weight:600;">23% — риск</div>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Клиенты по времени с последнего визита:</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-size:12px;color:var(--text-muted);min-width:80px;">0–14 дней</div>
+            <div style="flex:1;height:8px;background:var(--surface3);border-radius:4px;overflow:hidden;"><div style="width:45%;height:100%;background:var(--green);border-radius:4px;"></div></div>
+            <div style="font-size:12px;font-weight:600;min-width:30px;text-align:right;">66</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-size:12px;color:var(--text-muted);min-width:80px;">15–30 дней</div>
+            <div style="flex:1;height:8px;background:var(--surface3);border-radius:4px;overflow:hidden;"><div style="width:28%;height:100%;background:var(--blue);border-radius:4px;"></div></div>
+            <div style="font-size:12px;font-weight:600;min-width:30px;text-align:right;">47</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-size:12px;color:var(--text-muted);min-width:80px;">31–45 дней</div>
+            <div style="flex:1;height:8px;background:var(--surface3);border-radius:4px;overflow:hidden;"><div style="width:12%;height:100%;background:var(--amber);border-radius:4px;"></div></div>
+            <div style="font-size:12px;font-weight:600;min-width:30px;text-align:right;">20</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-size:12px;color:var(--red);min-width:80px;">45+ дней ⚠</div>
+            <div style="flex:1;height:8px;background:var(--surface3);border-radius:4px;overflow:hidden;"><div style="width:9%;height:100%;background:var(--red);border-radius:4px;"></div></div>
+            <div style="font-size:12px;font-weight:600;color:var(--red);min-width:30px;text-align:right;">14</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:10px;"></div>
+  </div>
+
+  <!-- INVENTORY PAGE -->
+  <div class="page" id="page-inventory">
+    <div class="header">
+      <div class="logo" style="font-size:18px;">Склад</div>
+      <button onclick="showToast('📦 Заказ сформирован и отправлен поставщику')" style="background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);padding:8px 14px;font-size:13px;font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;">Заказать</button>
+    </div>
+
+    <div class="section">
+      <div class="tag-filter">
+        <div class="tag active">Все</div>
+        <div class="tag" onclick="filterTag(this)">🔴 Критично</div>
+        <div class="tag" onclick="filterTag(this)">🟡 Мало</div>
+        <div class="tag" onclick="filterTag(this)">🟢 В норме</div>
+      </div>
+
+      <div class="inventory-item">
+        <div class="inv-icon">🎨</div>
+        <div class="inv-info">
+          <div class="inv-name">Крем-краска Matrix</div>
+          <div class="inv-bar"><div class="inv-bar-fill fill-critical" style="width:12%;"></div></div>
+          <div class="inv-qty">Остаток: 120 мл · Мин: 500 мл · Расход/день: 80 мл</div>
+        </div>
+        <div class="inv-status status-critical">КРИТИЧНО</div>
+      </div>
+
+      <div class="inventory-item">
+        <div class="inv-icon">💊</div>
+        <div class="inv-info">
+          <div class="inv-name">Оксидант 6%</div>
+          <div class="inv-bar"><div class="inv-bar-fill fill-low" style="width:35%;"></div></div>
+          <div class="inv-qty">Остаток: 350 мл · Мин: 500 мл · На 4 дня</div>
+        </div>
+        <div class="inv-status status-low">МАЛО</div>
+      </div>
+
+      <div class="inventory-item">
+        <div class="inv-icon">🧴</div>
+        <div class="inv-info">
+          <div class="inv-name">Шампунь Kerastase</div>
+          <div class="inv-bar"><div class="inv-bar-fill fill-ok" style="width:70%;"></div></div>
+          <div class="inv-qty">Остаток: 1 400 мл · Мин: 300 мл</div>
+        </div>
+        <div class="inv-status status-ok">В НОРМЕ</div>
+      </div>
+
+      <div class="inventory-item">
+        <div class="inv-icon">💅</div>
+        <div class="inv-info">
+          <div class="inv-name">Гель-лак Masura</div>
+          <div class="inv-bar"><div class="inv-bar-fill fill-ok" style="width:80%;"></div></div>
+          <div class="inv-qty">Остаток: 24 шт · Мин: 5 шт</div>
+        </div>
+        <div class="inv-status status-ok">В НОРМЕ</div>
+      </div>
+
+      <div class="inventory-item">
+        <div class="inv-icon">✂️</div>
+        <div class="inv-info">
+          <div class="inv-name">Одноразовые накидки</div>
+          <div class="inv-bar"><div class="inv-bar-fill fill-low" style="width:25%;"></div></div>
+          <div class="inv-qty">Остаток: 50 шт · Мин: 100 шт</div>
+        </div>
+        <div class="inv-status status-low">МАЛО</div>
+      </div>
+
+      <div class="inventory-item">
+        <div class="inv-icon">🪮</div>
+        <div class="inv-info">
+          <div class="inv-name">Маска для волос</div>
+          <div class="inv-bar"><div class="inv-bar-fill fill-ok" style="width:90%;"></div></div>
+          <div class="inv-qty">Остаток: 2 400 мл · Мин: 500 мл</div>
+        </div>
+        <div class="inv-status status-ok">В НОРМЕ</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">
+    <div class="nav-icon">📊</div>
+    <div class="nav-label">Обзор</div>
+  </div>
+  <div class="nav-item" id="nav-schedule" onclick="showPage('schedule')">
+    <div class="nav-icon">📅
+      <div class="nav-badge">5</div>
+    </div>
+    <div class="nav-label">Расписание</div>
+  </div>
+  <div class="nav-item" id="nav-clients" onclick="showPage('clients')">
+    <div class="nav-icon">👥
+      <div class="nav-badge">2</div>
+    </div>
+    <div class="nav-label">Клиенты</div>
+  </div>
+  <div class="nav-item" id="nav-analytics" onclick="showPage('analytics')">
+    <div class="nav-icon">📈</div>
+    <div class="nav-label">Аналитика</div>
+  </div>
+  <div class="nav-item" id="nav-inventory" onclick="showPage('inventory')">
+    <div class="nav-icon">📦
+      <div class="nav-badge">!</div>
+    </div>
+    <div class="nav-label">Склад</div>
+  </div>
+</div>
+
+<!-- ADD BOOKING MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Новая запись</div>
+
+    <div class="debt-warning" id="debt-warn">
+      ⚠️ У клиента долг 45 000 сум. Требуется решение администратора.
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Клиент</label>
+      <select class="form-input" onchange="checkDebt(this)">
+        <option>Выберите клиента...</option>
+        <option>Малика Расулова</option>
+        <option>Шахло Рашидова (VIP)</option>
+        <option>Зебо Азимова ⚠ долг 45K</option>
+        <option>Феруза Алиева</option>
+        <option value="new">+ Новый клиент</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Услуга</label>
+      <select class="form-input">
+        <option>Стрижка — 60 000 сум</option>
+        <option>Маникюр гель — 80 000 сум</option>
+        <option>Окрашивание — 150 000 сум</option>
+        <option>Брови — 40 000 сум</option>
+        <option>Укладка — 35 000 сум</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Мастер</label>
+      <select class="form-input">
+        <option>Зарина (87% загрузки)</option>
+        <option>Нилуфар (60% загрузки)</option>
+        <option>Диля (40% загрузки)</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Дата</label>
+        <input type="date" class="form-input" value="2025-03-19">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Время</label>
+        <select class="form-input">
+          <option>09:00</option>
+          <option>10:00</option>
+          <option selected>13:00</option>
+          <option>15:00</option>
+          <option>17:00</option>
+          <option>19:00</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-toggle" onclick="toggleDepositRequired(this)">
+        <div class="toggle-switch" id="deposit-toggle">
+          <div class="toggle-thumb"></div>
+        </div>
+        <div class="toggle-label">Требовать депозит</div>
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="saveBooking()">✓ Сохранить запись</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toast-text">—</span>
+</div>
+
+<script>
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const page = document.getElementById('page-' + name);
+    if (page) page.classList.add('active');
+    const nav = document.getElementById('nav-' + name);
+    if (nav) nav.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function filterTag(el) {
+    el.closest('.tag-filter').querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function openAddBooking() {
+    document.getElementById('add-modal').classList.add('open');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  document.getElementById('add-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal('add-modal');
+  });
+
+  function checkDebt(sel) {
+    document.getElementById('debt-warn').classList.toggle('show', sel.value.includes('Зебо'));
+  }
+
+  function toggleDepositRequired(el) {
+    const sw = el.querySelector('.toggle-switch');
+    sw.classList.toggle('on');
+  }
+
+  function saveBooking() {
+    closeModal('add-modal');
+    showToast('✅ Запись создана успешно');
+  }
+
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-text').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // Revenue chart
+  const weekData = [820, 650, 970, 1100, 890, 1240, 1150];
+  const weekDays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const max = Math.max(...weekData);
+  const todayIdx = 2;
+
+  const barsEl = document.getElementById('chart-bars');
+  const labelsEl = document.getElementById('chart-labels');
+
+  weekData.forEach((val, i) => {
+    const pct = (val / max) * 100;
+    const grp = document.createElement('div');
+    grp.className = 'bar-group';
+    grp.innerHTML = `<div class="bar ${i === todayIdx ? 'highlighted' : 'blue'}" style="height:${pct}%;"></div>`;
+    barsEl.appendChild(grp);
+
+    const lbl = document.createElement('div');
+    lbl.className = 'bar-day';
+    lbl.style.flex = '1';
+    lbl.style.textAlign = 'center';
+    lbl.style.fontSize = '9px';
+    lbl.style.color = i === todayIdx ? 'var(--teal)' : 'var(--text-dim)';
+    lbl.style.fontWeight = i === todayIdx ? '600' : '400';
+    lbl.textContent = weekDays[i];
+    labelsEl.appendChild(lbl);
+  });
+
+  // Services chart
+  const services = [
+    { name: 'Стрижка', pct: 100, color: 'var(--blue)' },
+    { name: 'Маникюр', pct: 80, color: 'var(--teal)' },
+    { name: 'Окрашивание', pct: 65, color: 'var(--amber)' },
+    { name: 'Брови', pct: 40, color: 'var(--green)' },
+    { name: 'Укладка', pct: 25, color: 'var(--text-muted)' },
+  ];
+
+  const svcEl = document.getElementById('services-bars');
+  services.forEach(s => {
+    const row = document.createElement('div');
+    row.style = 'display:flex;align-items:center;gap:10px;margin-bottom:10px;';
+    row.innerHTML = `
+      <div style="font-size:12px;color:var(--text-muted);min-width:80px;white-space:nowrap;">${s.name}</div>
+      <div style="flex:1;height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;">
+        <div style="width:${s.pct}%;height:100%;background:${s.color};border-radius:3px;transition:width 0.8s ease;"></div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:${s.color};min-width:28px;text-align:right;">${s.pct}%</div>
+    `;
+    svcEl.appendChild(row);
+  });
+
+  // Day navigation
+  const dayNames = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+  const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  let currentDay = new Date(2025, 2, 19);
+
+  function updateDayLabel() {
+    const el = document.getElementById('sched-date');
+    if (el) el.textContent = `${dayNames[currentDay.getDay()]}, ${currentDay.getDate()} ${months[currentDay.getMonth()]}`;
+  }
+
+  function prevDay() { currentDay.setDate(currentDay.getDate() - 1); updateDayLabel(); }
+  function nextDay() { currentDay.setDate(currentDay.getDate() + 1); updateDayLabel(); }
+</script>
+</body>
+</html>
