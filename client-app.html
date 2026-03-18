@@ -3,34 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>RegiForge — Запись</title>
+<title>RegiForge — Запись (Изумрудный шик)</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --blue:       #4A6FA5;
-    --blue-light: #E8F0F8;
-    --blue-mid:   #c8d9ee;
-    --slate:      #7B8FA3;
-    --teal:       #5A9A9E;
-    --teal-light: #dff0f1;
-    --teal-dim:   #b8d9db;
-    --warm:       #A89F91;
+    /* Основная палитра "Изумрудный шик" */
+    --primary: #1A4D4E;                /* Самаркандский изумруд */
+    --primary-light: #d9e8e8;          /* светлый оттенок */
+    --primary-mid: #9bb7b7;            /* средний */
+    --gold: #C6A15B;                    /* Золото Регистана */
+    --gold-light: #f3ebd9;
+    --gold-dim: #d9c9a6;
+    --dark: #2C3E4A;                    /* Глубокий сланец */
+    --dark-mid: #1e2f38;                /* тёмный для градиентов */
+    --bg: #F9F7F4;                       /* Белый Самаркандский мел */
+    --bg2: #f0eee9;                      /* чуть темнее для контраста */
+    --surface: #ffffff;
+    --surface2: #f5f3ef;
+    --border: #e0dbd2;
+    --text: #2C3E4A;
+    --text-mid: #4a5f68;
+    --text-muted: #6d828d;
+    --text-dim: #b8c0c8;
+
+    /* Семантические цвета */
+    --success: #A6C48A;   /* Ферганский фисташка */
+    --warning: #FFB57C;   /* Хлопковый персик */
+    --danger: #D55C5C;    /* Красная зона */
+
+    /* Прежние имена переменных оставлены для совместимости,
+       но им присвоены новые значения согласно ролям */
+    --blue: var(--primary);
+    --blue-light: var(--primary-light);
+    --blue-mid: var(--primary-mid);
+    --slate: var(--text-muted);
+    --teal: var(--gold);                 /* теперь teal = золото */
+    --teal-light: var(--gold-light);
+    --teal-dim: var(--gold-dim);
+    --warm: #A89F91;
     --warm-light: #f4f1ed;
-    --dark:       #2C3E50;
-    --dark-mid:   #3d5166;
-    --bg:         #F5F7FA;
-    --bg2:        #E8F0F8;
-    --surface:    #ffffff;
-    --surface2:   #F5F7FA;
-    --border:     #dce6f0;
-    --text:       #2C3E50;
-    --text-mid:   #4a6070;
-    --text-muted: #7B8FA3;
-    --text-dim:   #b8c8d8;
-    --radius:     16px;
-    --radius-sm:  10px;
-    --shadow:     0 2px 12px rgba(44,62,80,0.07);
-    --shadow-md:  0 4px 20px rgba(44,62,80,0.12);
+
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 2px 12px rgba(44,62,80,0.07);
+    --shadow-md: 0 4px 20px rgba(44,62,80,0.12);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: 'Nunito Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; }
@@ -40,43 +56,43 @@
 
   .header { background: var(--surface); padding: 20px 18px 16px; border-bottom: 1px solid var(--border); }
   .header-top { display: flex; align-items: center; justify-content: space-between; }
-  .logo { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: var(--blue); }
-  .logo span { color: var(--teal); }
-  .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--blue-light); border: 2px solid var(--blue-mid); display: flex; align-items: center; justify-content: center; font-size: 15px; cursor: pointer; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: var(--primary); }
+  .logo span { color: var(--gold); }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--primary-light); border: 2px solid var(--primary-mid); display: flex; align-items: center; justify-content: center; font-size: 15px; cursor: pointer; }
   .greeting { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
 
-  .hero { margin: 16px; background: linear-gradient(135deg, var(--blue) 0%, var(--dark-mid) 100%); border-radius: var(--radius); padding: 24px 22px; position: relative; overflow: hidden; box-shadow: var(--shadow-md); }
+  .hero { margin: 16px; background: linear-gradient(135deg, var(--primary) 0%, var(--dark-mid) 100%); border-radius: var(--radius); padding: 24px 22px; position: relative; overflow: hidden; box-shadow: var(--shadow-md); }
   .hero::before { content: ''; position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: rgba(255,255,255,0.06); border-radius: 50%; }
-  .hero::after { content: ''; position: absolute; bottom: -25px; left: 20px; width: 80px; height: 80px; background: rgba(90,154,158,0.22); border-radius: 50%; }
+  .hero::after { content: ''; position: absolute; bottom: -25px; left: 20px; width: 80px; height: 80px; background: rgba(198,161,91,0.22); border-radius: 50%; } /* золото в прозрачности */
   .hero-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 10px; font-weight: 600; }
   .hero-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 500; line-height: 1.25; color: #fff; margin-bottom: 18px; }
-  .hero-title em { font-style: italic; color: #a8d4d7; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 7px; background: #fff; color: var(--blue); font-family: 'Nunito Sans', sans-serif; font-weight: 700; font-size: 14px; padding: 10px 20px; border-radius: 50px; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
+  .hero-title em { font-style: italic; color: var(--gold-light); }
+  .btn-primary { display: inline-flex; align-items: center; gap: 7px; background: var(--primary); color: #fff; font-family: 'Nunito Sans', sans-serif; font-weight: 700; font-size: 14px; padding: 10px 20px; border-radius: 50px; border: 1px solid var(--gold); cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
   .btn-primary:active { transform: scale(0.97); }
 
   .section { padding: 20px 16px 0; }
   .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
   .section-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 500; color: var(--dark); }
-  .section-link { font-size: 12px; color: var(--blue); cursor: pointer; font-weight: 700; }
+  .section-link { font-size: 12px; color: var(--primary); cursor: pointer; font-weight: 700; }
 
   .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .service-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px 14px; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow); }
   .service-card:active { transform: scale(0.97); }
-  .service-card.selected { border-color: var(--blue); background: var(--blue-light); }
+  .service-card.selected { border-color: var(--primary); background: var(--primary-light); }
   .service-icon { font-size: 24px; margin-bottom: 9px; display: block; }
   .service-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; color: var(--dark); }
-  .service-price { font-size: 12px; color: var(--blue); font-weight: 700; }
+  .service-price { font-size: 12px; color: var(--primary); font-weight: 700; }
   .service-duration { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
   .masters-row { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
   .masters-row::-webkit-scrollbar { display: none; }
   .master-card { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer; }
   .master-ava { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--surface); transition: all 0.2s; position: relative; box-shadow: var(--shadow); }
-  .master-card.selected .master-ava { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(74,111,165,0.18); }
-  .master-badge { position: absolute; bottom: 0; right: 0; width: 18px; height: 18px; background: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; border: 2px solid var(--bg); }
+  .master-card.selected .master-ava { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,77,78,0.18); }
+  .master-badge { position: absolute; bottom: 0; right: 0; width: 18px; height: 18px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; border: 2px solid var(--bg); }
   .master-name { font-size: 12px; font-weight: 700; text-align: center; color: var(--dark); }
   .master-spec { font-size: 10px; color: var(--text-muted); text-align: center; margin-top: -3px; }
-  .master-rating { font-size: 11px; color: var(--teal); font-weight: 700; }
+  .master-rating { font-size: 11px; color: var(--gold); font-weight: 700; }
 
   .calendar-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
   .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
@@ -87,18 +103,18 @@
   .cal-day-name { text-align: center; font-size: 10px; color: var(--text-dim); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
   .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 13px; cursor: pointer; transition: all 0.2s; position: relative; color: var(--text-mid); }
-  .cal-day:not(.empty):hover { background: var(--blue-light); }
-  .cal-day.today { color: var(--blue); font-weight: 700; }
-  .cal-day.selected { background: var(--blue); color: #fff; font-weight: 700; }
+  .cal-day:not(.empty):hover { background: var(--primary-light); }
+  .cal-day.today { color: var(--primary); font-weight: 700; }
+  .cal-day.selected { background: var(--primary); color: #fff; font-weight: 700; }
   .cal-day.past { color: var(--text-dim); pointer-events: none; }
-  .cal-day.has-slots::after { content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; border-radius: 50%; background: var(--teal); }
+  .cal-day.has-slots::after { content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; border-radius: 50%; background: var(--gold); }
   .cal-day.selected::after { background: rgba(255,255,255,0.5); }
   .cal-day.empty { pointer-events: none; }
 
   .slots-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .slot { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; color: var(--text-mid); box-shadow: var(--shadow); }
   .slot:active { transform: scale(0.96); }
-  .slot.selected { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .slot.selected { background: var(--gold); border-color: var(--gold); color: #fff; }
   .slot.busy { color: var(--text-dim); pointer-events: none; background: var(--surface2); border-color: var(--border); box-shadow: none; text-decoration: line-through; font-weight: 400; }
 
   .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin: 0 16px; box-shadow: var(--shadow); }
@@ -107,72 +123,72 @@
   .summary-row:last-child { border-bottom: none; }
   .summary-label { font-size: 13px; color: var(--text-muted); }
   .summary-value { font-size: 13px; font-weight: 700; color: var(--dark); }
-  .summary-value.accent { color: var(--blue); }
+  .summary-value.accent { color: var(--primary); }
 
   .deposit-note { font-size: 11px; color: var(--text-muted); text-align: center; margin: 10px 16px 0; line-height: 1.5; background: var(--bg2); padding: 10px 14px; border-radius: var(--radius-sm); }
 
   .bottom-action { padding: 16px; margin-top: auto; }
-  .btn-book { width: 100%; padding: 15px; border-radius: var(--radius); border: none; background: linear-gradient(135deg, var(--blue), var(--dark-mid)); color: #fff; font-family: 'Nunito Sans', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(74,111,165,0.35); }
+  .btn-book { width: 100%; padding: 15px; border-radius: var(--radius); border: none; background: linear-gradient(135deg, var(--primary), var(--dark-mid)); color: #fff; font-family: 'Nunito Sans', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(26,77,78,0.35); }
   .btn-book:active { transform: scale(0.98); }
   .btn-book:disabled { background: var(--surface2); color: var(--text-dim); box-shadow: none; pointer-events: none; border: 1px solid var(--border); }
 
   .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 16px; z-index: 100; box-shadow: 0 -2px 12px rgba(44,62,80,0.06); }
   .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; color: var(--text-dim); transition: color 0.2s; padding: 4px 16px; }
-  .nav-item.active { color: var(--blue); }
+  .nav-item.active { color: var(--primary); }
   .nav-icon { font-size: 20px; }
   .nav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.04em; }
 
   .appt-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; box-shadow: var(--shadow); }
-  .appt-date-block { background: var(--blue-light); border-radius: var(--radius-sm); width: 48px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--blue-mid); }
-  .appt-day { font-size: 20px; font-weight: 700; color: var(--blue); line-height: 1; }
+  .appt-date-block { background: var(--primary-light); border-radius: var(--radius-sm); width: 48px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--primary-mid); }
+  .appt-day { font-size: 20px; font-weight: 700; color: var(--primary); line-height: 1; }
   .appt-mon { font-size: 10px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
   .appt-info { flex: 1; }
   .appt-service { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--dark); }
   .appt-meta { font-size: 12px; color: var(--text-muted); display: flex; gap: 10px; }
   .appt-status { font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: 700; letter-spacing: 0.04em; margin-left: auto; white-space: nowrap; }
-  .status-confirmed { background: var(--blue-light); color: var(--blue); }
-  .status-done { background: var(--teal-light); color: var(--teal); }
-  .status-cancelled { background: #fdecea; color: #c0392b; }
+  .status-confirmed { background: var(--success); color: #1f4f2b; }
+  .status-done { background: #d0e2b0; color: #2c5e2c; }
+  .status-cancelled { background: #fdecea; color: var(--danger); }
 
-  .review-prompt { background: linear-gradient(135deg, var(--teal-light), var(--blue-light)); border: 1px solid var(--teal-dim); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 12px; }
+  .review-prompt { background: linear-gradient(135deg, var(--gold-light), var(--primary-light)); border: 1px solid var(--gold-dim); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 12px; }
   .review-prompt-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; color: var(--dark); }
   .review-prompt-sub { font-size: 11px; color: var(--text-muted); }
   .stars-row { display: flex; gap: 5px; margin-top: 8px; }
   .star { font-size: 22px; cursor: pointer; color: var(--border); transition: color 0.15s; }
-  .star.lit { color: #e6a817; }
+  .star.lit { color: var(--gold); }
 
-  .loyalty-card { background: linear-gradient(135deg, var(--dark) 0%, var(--dark-mid) 100%); border-radius: var(--radius); padding: 20px; position: relative; overflow: hidden; margin-bottom: 12px; box-shadow: var(--shadow-md); }
-  .loyalty-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(90,154,158,0.18); border-radius: 50%; }
-  .loyalty-level { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #a8d4d7; margin-bottom: 6px; font-weight: 700; }
+  .loyalty-card { background: linear-gradient(135deg, var(--primary) 0%, var(--dark-mid) 100%); border-radius: var(--radius); padding: 20px; position: relative; overflow: hidden; margin-bottom: 12px; box-shadow: var(--shadow-md); }
+  .loyalty-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(198,161,91,0.18); border-radius: 50%; } /* золото */
+  .loyalty-level { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 6px; font-weight: 700; }
   .loyalty-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 500; color: #fff; margin-bottom: 14px; }
   .loyalty-points { display: flex; align-items: baseline; gap: 6px; margin-bottom: 14px; }
-  .points-num { font-size: 36px; font-weight: 300; font-family: 'Playfair Display', serif; color: #a8d4d7; line-height: 1; }
+  .points-num { font-size: 36px; font-weight: 300; font-family: 'Playfair Display', serif; color: var(--gold-light); line-height: 1; }
   .points-label { font-size: 13px; color: rgba(255,255,255,0.5); }
   .progress-bar { background: rgba(255,255,255,0.1); border-radius: 3px; height: 4px; overflow: hidden; margin-bottom: 6px; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), #a8d4d7); border-radius: 3px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 3px; }
   .progress-label { font-size: 11px; color: rgba(255,255,255,0.4); display: flex; justify-content: space-between; }
 
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,62,80,0.45); backdrop-filter: blur(4px); z-index: 200; align-items: flex-end; justify-content: center; }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; padding: 26px 22px 34px; width: 100%; max-width: 430px; text-align: center; animation: slideUp 0.28s ease; border-top: 3px solid var(--blue); }
+  .modal { background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; padding: 26px 22px 34px; width: 100%; max-width: 430px; text-align: center; animation: slideUp 0.28s ease; border-top: 3px solid var(--gold); }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   .modal-icon { font-size: 46px; margin-bottom: 12px; }
   .modal-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; color: var(--dark); margin-bottom: 6px; }
   .modal-sub { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
   .payment-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
   .payment-btn { padding: 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--surface2); color: var(--dark); font-family: 'Nunito Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .payment-btn:hover { border-color: var(--blue); background: var(--blue-light); }
+  .payment-btn:hover { border-color: var(--primary); background: var(--primary-light); }
   .payment-btn span { font-size: 20px; }
   .btn-close-modal { width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Nunito Sans', sans-serif; font-size: 14px; cursor: pointer; }
 
   .success-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 300; align-items: center; justify-content: center; flex-direction: column; gap: 14px; text-align: center; padding: 32px; }
   .success-overlay.open { display: flex; }
-  .success-icon { width: 76px; height: 76px; border-radius: 50%; background: var(--teal-light); border: 2.5px solid var(--teal); display: flex; align-items: center; justify-content: center; font-size: 34px; animation: pulse 2.5s infinite; }
-  @keyframes pulse { 0%,100%{ box-shadow:0 0 0 0 rgba(90,154,158,0.3);} 50%{ box-shadow:0 0 0 14px rgba(90,154,158,0);} }
+  .success-icon { width: 76px; height: 76px; border-radius: 50%; background: var(--success); border: 2.5px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 34px; animation: pulse 2.5s infinite; }
+  @keyframes pulse { 0%,100%{ box-shadow:0 0 0 0 rgba(26,77,78,0.3);} 50%{ box-shadow:0 0 0 14px rgba(26,77,78,0);} }
   .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--border); padding: 5px 12px; border-radius: 20px; font-size: 12px; color: var(--text-muted); margin: 2px; font-weight: 600; }
   .divider { height: 1px; background: var(--border); margin: 18px 16px; }
   .step-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 </style>
 </head>
 <body>
@@ -354,19 +370,19 @@
         <div class="progress-label"><span>До VIP статуса</span><span>160 баллов</span></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--shadow);"><div style="font-size:22px;font-family:'Playfair Display',serif;color:var(--blue);font-weight:600;">12</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-weight:700;">Визитов</div></div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--shadow);"><div style="font-size:22px;font-family:'Playfair Display',serif;color:var(--blue);font-weight:600;">580K</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-weight:700;">Потрачено</div></div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--shadow);"><div style="font-size:22px;font-family:'Playfair Display',serif;color:var(--teal);font-weight:600;">4.9</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-weight:700;">Рейтинг</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--shadow);"><div style="font-size:22px;font-family:'Playfair Display',serif;color:var(--primary);font-weight:600;">12</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-weight:700;">Визитов</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--shadow);"><div style="font-size:22px;font-family:'Playfair Display',serif;color:var(--primary);font-weight:600;">580K</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-weight:700;">Потрачено</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--shadow);"><div style="font-size:22px;font-family:'Playfair Display',serif;color:var(--gold);font-weight:600;">4.9</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-weight:700;">Рейтинг</div></div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;box-shadow:var(--shadow);">
         <div style="font-size:10px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;font-weight:700;">Любимый мастер</div>
         <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:42px;height:42px;border-radius:50%;background:var(--blue-light);border:2px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:20px;">👩‍🦱</div>
+          <div style="width:42px;height:42px;border-radius:50%;background:var(--primary-light);border:2px solid var(--primary-mid);display:flex;align-items:center;justify-content:center;font-size:20px;">👩‍🦱</div>
           <div><div style="font-weight:700;margin-bottom:2px;color:var(--dark);">Зарина</div><div style="font-size:12px;color:var(--text-muted);">Стилист · 8 визитов</div></div>
-          <div style="margin-left:auto;color:var(--teal);font-weight:700;">★ 4.9</div>
+          <div style="margin-left:auto;color:var(--gold);font-weight:700;">★ 4.9</div>
         </div>
       </div>
-      <div style="background:linear-gradient(135deg,var(--teal-light),var(--blue-light));border:1px solid var(--teal-dim);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px;">
+      <div style="background:linear-gradient(135deg,var(--gold-light),var(--primary-light));border:1px solid var(--gold-dim);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px;">
         <span style="font-size:28px;">🎂</span>
         <div><div style="font-size:13px;font-weight:700;margin-bottom:2px;color:var(--dark);">Бонус на день рождения</div><div style="font-size:12px;color:var(--text-muted);">+100 баллов начислятся 15 апреля</div></div>
       </div>
@@ -404,7 +420,7 @@
     <div class="chip">👩‍🦱 <span id="success-master">Зарина</span></div>
     <div class="chip">📅 <span id="success-dt">22 марта 14:00</span></div>
   </div>
-  <button class="btn-primary" onclick="closeSuccess()" style="margin-top:16px;background:var(--blue);color:#fff;">На главную</button>
+  <button class="btn-primary" onclick="closeSuccess()" style="margin-top:16px;">На главную</button>
 </div>
 
 <script>
